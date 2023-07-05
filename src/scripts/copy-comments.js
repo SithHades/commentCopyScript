@@ -14,17 +14,15 @@ async function copyComments() {
     comments[match[2]] = match[1].trim(); // updated capture group
   }
 
-  /*   console.log(
-    'Found comments for',
-    Object.keys(comments).length,
-    'functions'
-  );
-  console.log(comments); */
-
   // Insert comments into command files
 
   for (const file of commandFiles) {
     let content = await fs.readFile(file, 'utf8');
+
+    content = content.replace(/\/\*{2}[\s\S]*?\*\//g, '');
+
+    content = content.replace(/[\r\n]{3,}/g, '\n\n');
+
     for (const [func, comment] of Object.entries(comments)) {
       const funcRegex = new RegExp(
         `(Cypress\\.Commands\\.add\\('${func}',\\s*\\(\\)\\s*=>\\s*\\{)`
